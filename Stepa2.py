@@ -16,7 +16,7 @@ response = requests.get(url2)
 data1 = json.loads(response.content)
 percent_humidity = int(data1['main']['humidity'])
 
-client = Client(host='localhost', port = '9000', database = 'metrika')
+client = Client(host='172.16.16.162', port = '8123', database = 'metrika')
 sql = 'select count(distinct(article_id)) from (select replaceAll(Params, \'""\', \'"\') as Params2, visitParamExtractInt(Params2, \'article_id\') as article_id, replaceAll(visitParamExtractRaw(Params2, \'published_date\'),\'"\',\'\') as published, Title from hits_all where Date = toDate(yesterday()) and published = toString(toDate(yesterday())) and match(URL, \'putin\')=1)'
 count_putin_articles = int((client.execute(sql)[0])[0])
 

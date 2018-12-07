@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-import random
-import time
 from pandas import read_json
 import requests
 import json
-from clickhouse_driver import Client
-from time import sleep
+import pymysql
 
 url1 = 'https://openexchangerates.org/api/latest.json?app_id=f68b28fcd4f642678f54e8725387778a'
 df1 = read_json(url1, orient = 'rates')
@@ -16,9 +13,15 @@ response = requests.get(url2)
 data1 = json.loads(response.content)
 percent_humidity = int(data1['main']['humidity'])
 
-client = Client(host='172.16.16.162', port = '8123', database = 'metrika')
-sql = 'select count(distinct(article_id)) from (select replaceAll(Params, \'""\', \'"\') as Params2, visitParamExtractInt(Params2, \'article_id\') as article_id, replaceAll(visitParamExtractRaw(Params2, \'published_date\'),\'"\',\'\') as published, Title from hits_all where Date = toDate(yesterday()) and published = toString(toDate(yesterday())) and match(URL, \'putin\')=1)'
-count_putin_articles = int((client.execute(sql)[0])[0])
+db = pymysql.connect(host="144.76.65.54",user="read_only",password="9her32yG",db="tvrain_r2d2")
+cursor = db.cursor()
+query = "select count(id) from (select id, name from tv_articles where name like \'%Путин%\' and active = 1 and cast(date_active_start as date) = curdate()- interval 1 day) putin"
+
+cursor.execute(query)
+
+data = cursor.fetchone()
+
+count_putin_articles = data[0]
 
 x = dollar_rate ** count_putin_articles % percent_humidity
 y = x % 2

@@ -13,7 +13,7 @@ response = requests.get(url2)
 data1 = json.loads(response.content)
 percent_humidity = int(data1['main']['humidity'])
 
-db = pymysql.connect(host="144.76.65.54",user="read_only",password="9her32yG",db="tvrain_r2d2")
+db = pymysql.connect(host="144.76.65.54",port="3306",user="read_only",password="9her32yG",db="tvrain_r2d2")
 cursor = db.cursor()
 query = "select count(id) from (select id, name from tv_articles where name like \'%Путин%\' and active = 1 and cast(date_active_start as date) = curdate()- interval 1 day) putin"
 
